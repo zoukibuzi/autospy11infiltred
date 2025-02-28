@@ -93,7 +93,7 @@ function simulateTestCode(basePrice, platform) {
 
     // Teste des codes diversifiés (invalides ou légers avantages)
     const allCodes = TEST_CODES;
-    for (const code of random.sample(allCodes, 50)) { // 50 codes aléatoires par plateforme
+    for (const code of allCodes.sort(() => 0.5 - Math.random()).slice(0, 50)) { // 50 codes aléatoires par plateforme
         let discount = Math.random() * 0.1 + 0.95; // Réduction de 0-5% pour codes invalides
         let condition = "Test diversifié, invalide";
         let valid = Math.random() > 0.8; // 20% chance de succès pour codes divers
@@ -197,6 +197,7 @@ if (!Array.prototype.sample) {
     };
 }
 
+// Désactiver le service worker si problème (optionnel, commente si besoin)
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js'); // Chemin corrigé
+    // navigator.serviceWorker.register('./service-worker.js'); // Commente cette ligne si erreur persiste
 }
