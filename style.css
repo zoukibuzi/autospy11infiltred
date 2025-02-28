@@ -54,9 +54,42 @@ canvas {
     max-height: 200px;
 }
 
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #333;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #444;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 5px;
+}
+
+.close {
+    color: #fff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #007bff;
+}
+
 @media (max-width: 600px) {
     h1 { font-size: 20px; }
     button { font-size: 14px; padding: 8px 16px; }
     th, td { font-size: 12px; padding: 6px; }
     table { font-size: 12px; }
+    .modal-content { width: 90%; margin: 20% auto; }
 }
