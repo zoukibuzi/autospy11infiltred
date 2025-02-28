@@ -41,6 +41,7 @@ th, td {
     border: 1px solid #444;
     padding: 8px;
     font-size: 14px;
+    text-align: left;
 }
 
 th {
@@ -57,4 +58,5 @@ canvas {
     h1 { font-size: 20px; }
     button { font-size: 14px; padding: 8px 16px; }
     th, td { font-size: 12px; padding: 6px; }
+    table { font-size: 12px; }
 }
