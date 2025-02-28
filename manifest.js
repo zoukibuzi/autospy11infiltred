@@ -1,5 +1,5 @@
 {
-    "name": "TravelSlasher 10.0",
+    "name": "TravelSlasher 10.1",
     "short_name": "TravelSlasher",
     "start_url": "/index.html",
     "display": "standalone",
