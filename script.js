@@ -27,27 +27,27 @@ const PLATFORMS = {
 // Codes promo uniques par plateforme avec conditions et réductions (valides)
 const PLATFORM_PROMOS = {
     // Compagnies aériennes
-    "Air France": [{ code: "AFVIP15", discount: 0.85, condition: "Nouveau client, vols long-courrier" }],
-    "easyJet": [{ code: "EASYFLASH25", discount: 0.75, condition: "Réservation avant 28/02/2025, low-cost" }],
-    "Ryanair": [{ code: "RYANBOOST20", discount: 0.8, condition: "Low-cost, siège prioritaire requis" }],
-    "Transavia France": [{ code: "TRANSDEAL12", discount: 0.88, condition: "Vols européens, Air France" }],
-    "Vueling Airlines": [{ code: "VUELCLUB22", discount: 0.78, condition: "Membre Vueling Club, Paris-Nice" }],
-    "Lufthansa": [{ code: "LHFRA10", discount: 0.9, condition: "Connexion via Frankfurt, business class" }],
-    "British Airways": [{ code: "BAUK15", discount: 0.85, condition: "Vol Paris-Londres uniquement" }],
-    "Iberia": [{ code: "IBESP18", discount: 0.82, condition: "Vols vers l’Espagne, Madrid-Barcelone" }],
-    "Volotea": [{ code: "VOLOREG8", discount: 0.92, condition: "Routes régionales françaises" }],
-    "Air Corsica": [{ code: "CORSE15", discount: 0.85, condition: "Liaisons Corse-continent, été 2025" }],
-    "KLM": [{ code: "KLMPARTNER30", discount: 0.7, condition: "Partenaires Air France, long-courrier" }],
-    "Wizz Air": [{ code: "WIZZEURO28", discount: 0.72, condition: "Paiement en ligne, Europe de l’Est" }],
-    "TAP Air Portugal": [{ code: "TAPPORT20", discount: 0.8, condition: "Vol vers Portugal, Lisbonne" }],
-    "Eurowings": [{ code: "EUROWIN12", discount: 0.88, condition: "Vols courts-courriers, Allemagne" }],
-    "French Bee": [{ code: "FRENCHDOM25", discount: 0.75, condition: "Long-courrier DOM-TOM/USA, été 2025" }],
+    "Air France": { code: "AFVIP15", discount: 0.85, condition: "Nouveau client, vols long-courrier" },
+    "easyJet": { code: "EASYFLASH25", discount: 0.75, condition: "Réservation avant 28/02/2025, low-cost" },
+    "Ryanair": { code: "RYANBOOST20", discount: 0.8, condition: "Low-cost, siège prioritaire requis" },
+    "Transavia France": { code: "TRANSDEAL12", discount: 0.88, condition: "Vols européens, Air France" },
+    "Vueling Airlines": { code: "VUELCLUB22", discount: 0.78, condition: "Membre Vueling Club, Paris-Nice" },
+    "Lufthansa": { code: "LHFRA10", discount: 0.9, condition: "Connexion via Frankfurt, business class" },
+    "British Airways": { code: "BAUK15", discount: 0.85, condition: "Vol Paris-Londres uniquement" },
+    "Iberia": { code: "IBESP18", discount: 0.82, condition: "Vols vers l’Espagne, Madrid-Barcelone" },
+    "Volotea": { code: "VOLOREG8", discount: 0.92, condition: "Routes régionales françaises" },
+    "Air Corsica": { code: "CORSE15", discount: 0.85, condition: "Liaisons Corse-continent, été 2025" },
+    "KLM": { code: "KLMPARTNER30", discount: 0.7, condition: "Partenaires Air France, long-courrier" },
+    "Wizz Air": { code: "WIZZEURO28", discount: 0.72, condition: "Paiement en ligne, Europe de l’Est" },
+    "TAP Air Portugal": { code: "TAPPORT20", discount: 0.8, condition: "Vol vers Portugal, Lisbonne" },
+    "Eurowings": { code: "EUROWIN12", discount: 0.88, condition: "Vols courts-courriers, Allemagne" },
+    "French Bee": { code: "FRENCHDOM25", discount: 0.75, condition: "Long-courrier DOM-TOM/USA, été 2025" },
     // Sites de réservation
-    "Booking.com": [{ code: "BOOKGENIUS22", discount: 0.78, condition: "Membre Booking Genius Niveau 2, 3+ nuits" }],
-    "Airbnb": [{ code: "AIRBNBREF28", discount: 0.72, condition: "Nouveau client, parrainage requis, Paris" }],
-    "Expedia": [{ code: "EXPAPP15", discount: 0.85, condition: "Via app Expedia, hôtels 4*+" }],
-    "Hotels.com": [{ code: "HOTELSELECT18", discount: 0.82, condition: "Hôtels sélectionnés, 5+ nuits" }],
-    "Agoda": [{ code: "AGOPAY20", discount: 0.8, condition: "Paiement par carte de crédit, Asie" }]
+    "Booking.com": { code: "BOOKGENIUS22", discount: 0.78, condition: "Membre Booking Genius Niveau 2, 3+ nuits" },
+    "Airbnb": { code: "AIRBNBREF28", discount: 0.72, condition: "Nouveau client, parrainage requis, Paris" },
+    "Expedia": { code: "EXPAPP15", discount: 0.85, condition: "Via app Expedia, hôtels 4*+" },
+    "Hotels.com": { code: "HOTELSELECT18", discount: 0.82, condition: "Hôtels sélectionnés, 5+ nuits" },
+    "Agoda": { code: "AGOPAY20", discount: 0.8, condition: "Paiement par carte de crédit, Asie" }
 };
 
 // Liste élargie de codes testés (100+ par plateforme, diversifiés)
@@ -70,33 +70,37 @@ function simulateScrape(url) {
 }
 
 function simulateTestCode(basePrice, platform) {
-    const promos = PLATFORM_PROMOS[platform] || [];
+    const promo = PLATFORM_PROMOS[platform] || {};
     const testedCodes = [];
     let bestPrice = basePrice;
     let bestCode = "Aucun code valide";
     let bestDiscount = 0;
     let bestCondition = "Aucune condition";
 
-    // Teste tous les codes possibles (valides + diversifiés)
-    const allCodes = [...TEST_CODES, ...promos.map(p => p.code)];
-    allCodes.forEach(code => {
-        let discount = 1.0; // Pas de réduction par défaut
-        let condition = "Invalide";
-        let valid = false;
-
-        // Vérifie si c’est un code valide de PLATFORM_PROMOS
-        const validPromo = promos.find(p => p.code === code);
-        if (validPromo) {
-            discount = validPromo.discount;
-            condition = validPromo.condition;
-            valid = Math.random() > 0.2; // 80% chance de succès
-        } else {
-            // Code diversifié (invalide ou réduction faible)
-            discount = Math.random() * 0.1 + 0.95; // Réduction de 0-5% pour codes invalides
-            valid = Math.random() > 0.8; // 20% chance de succès pour codes divers
-            condition = `Test diversifié, ${valid ? "léger avantage" : "invalide"}`;
+    // Teste le code valide principal (garanti valide)
+    if (promo.code) {
+        const validPrice = basePrice * promo.discount;
+        const valid = Math.random() > 0.2; // 80% chance de succès
+        testedCodes.push({ code: promo.code, price: validPrice, valid, discount: (basePrice - validPrice) / basePrice * 100 || 0, condition: promo.condition });
+        if (valid && validPrice < bestPrice) {
+            bestPrice = validPrice;
+            bestCode = promo.code;
+            bestDiscount = (basePrice - bestPrice) / basePrice * 100;
+            bestCondition = promo.condition;
         }
+        console.log(`[DAN] Test code ${promo.code} sur ${platform} : Nouveau prix : ${validPrice.toFixed(2)} €${valid ? " (valide)" : ""}`);
+    }
 
+    // Teste des codes diversifiés (invalides ou légers avantages)
+    const allCodes = TEST_CODES;
+    for (const code of random.sample(allCodes, 50)) { // 50 codes aléatoires par plateforme
+        let discount = Math.random() * 0.1 + 0.95; // Réduction de 0-5% pour codes invalides
+        let condition = "Test diversifié, invalide";
+        let valid = Math.random() > 0.8; // 20% chance de succès pour codes divers
+        if (valid) {
+            discount = Math.random() * 0.2 + 0.8; // Réduction de 0-20% si valide
+            condition = "Test diversifié, léger avantage";
+        }
         const newPrice = basePrice * discount;
         testedCodes.push({ code, price: newPrice, valid, discount: (basePrice - newPrice) / basePrice * 100 || 0, condition });
         if (valid && newPrice < bestPrice) {
@@ -106,7 +110,7 @@ function simulateTestCode(basePrice, platform) {
             bestCondition = condition;
         }
         console.log(`[DAN] Test code ${code} sur ${platform} : Nouveau prix : ${newPrice.toFixed(2)} €${valid ? " (valide)" : ""}`);
-    });
+    }
 
     return { newPrice: bestPrice, valid: bestCode !== "Aucun code valide", condition: bestCondition, testedCodes };
 }
@@ -150,7 +154,7 @@ function startSimulation() {
             const basePrice = simulateScrape(url);
             const { newPrice, valid, condition, testedCodes } = simulateTestCode(basePrice, platform);
             let bestPrice = valid ? newPrice : basePrice;
-            let bestCode = valid ? PLATFORMS[platform].find(p => p.code === newPrice)?.code || "Aucun code valide" : "Aucun code valide";
+            let bestCode = valid ? (PLATFORM_PROMOS[platform]?.code || "Aucun code valide") : "Aucun code valide";
             let bestDiscount = valid ? (basePrice - bestPrice) / basePrice * 100 : 0;
 
             const row = document.createElement("tr");
@@ -185,6 +189,14 @@ function displayFinalResults() {
     console.log("[DAN] Simulation terminée ! Classement final affiché.");
 }
 
+// Polyfill pour random.sample (simule un échantillon aléatoire)
+if (!Array.prototype.sample) {
+    Array.prototype.sample = function(n) {
+        const shuffled = this.sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, n);
+    };
+}
+
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js');
+    navigator.serviceWorker.register('./service-worker.js'); // Chemin corrigé
 }
