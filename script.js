@@ -1,144 +1,95 @@
-// Liste des 13 compagnies aériennes + 51 sites de réservation (14 ici pour simuler, extensible à 64)
-const PLATFORMS = {
-    // Compagnies aériennes
-    "Air France": "https://www.airfrance.fr",
-    "easyJet": "https://www.easyjet.com/fr",
-    "Ryanair": "https://www.ryanair.com/fr",
-    "Transavia France": "https://www.transavia.com/fr-FR",
-    "Vueling Airlines": "https://www.vueling.com/fr",
-    "Lufthansa": "https://www.lufthansa.com/fr/fr",
-    "British Airways": "https://www.britishairways.com/fr-fr",
-    "Iberia": "https://www.iberia.com/fr",
-    "Volotea": "https://www.volotea.com",
-    "Air Corsica": "https://www.aircorsica.com",
-    "KLM": "https://www.klm.fr",
-    "Wizz Air": "https://wizzair.com/fr-fr",
-    "TAP Air Portugal": "https://www.flytap.com/fr-fr",
-    "Eurowings": "https://www.eurowings.com/fr",
-    "French Bee": "https://www.frenchbee.com/fr",
-    // Sites de réservation (5 ici pour simuler, extensible à 51)
-    "Booking.com": "https://www.booking.com",
-    "Airbnb": "https://www.airbnb.com",
-    "Expedia": "https://www.expedia.com",
-    "Hotels.com": "https://www.hotels.com",
-    "Agoda": "https://www.agoda.com"
-};
-
-// Liste de codes promo avec conditions
-const PROMO_CODES = [
-    { code: "AFWELCOME", condition: "Nouveau client, vols long-courrier" },
-    { code: "EASY20", condition: "Réservation avant 31/03/2025" },
-    { code: "RYAN15", condition: "Vols low-cost, siège prioritaire requis" },
-    { code: "TRANS10", condition: "Vols européens seulement" },
-    { code: "VUEL20", condition: "Membre Vueling Club" },
-    { code: "LH5OFF", condition: "Connexion via Frankfurt" },
-    { code: "BA10SAVE", condition: "Vol Paris-Londres uniquement" },
-    { code: "IBERIA15", condition: "Vols vers l’Espagne" },
-    { code: "VOLOTEA5", condition: "Routes régionales françaises" },
-    { code: "AIRCORSICA10", condition: "Liaisons Corse-continent" },
-    { code: "KLM25", condition: "Partenaires Air France" },
-    { code: "WIZZ30", condition: "Paiement en ligne uniquement" },
-    { code: "TAP20", condition: "Vol vers Portugal" },
-    { code: "EUROWINGS15", condition: "Vols courts-courriers" },
-    { code: "FRENCHBEE25", condition: "Long-courrier DOM-TOM/USA" },
-    { code: "GENIUS20", condition: "Membre Booking Genius Niveau 2" },
-    { code: "REFER25", condition: "Nouveau client, parrainage requis" },
-    { code: "SAVE10", condition: "Réservation avant 31/03/2025" },
-    { code: "TRAVEL20", condition: "Séjour de 3+ nuits" },
-    { code: "HOTEL15", condition: "Hôtels sélectionnés seulement" }
-];
-
-let chart;
-
-function simulateScrape(url) {
-    const basePrice = 600 + Math.random() * 100 - 50; // Entre 550 et 650 € (réaliste pour vols/hôtels 2025)
-    console.log(`[DAN] Scraping ${url}... Prix brut : ${basePrice.toFixed(2)} €`);
-    return basePrice;
+body {
+    background-color: #1a1a1a;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 10px;
 }
 
-function simulateTestCode(basePrice, code) {
-    const promo = PROMO_CODES.find(p => p.code === code);
-    const discount = {
-        "AFWELCOME": 0.9, "EASY20": 0.8, "RYAN15": 0.85, "TRANS10": 0.9, "VUEL20": 0.8,
-        "LH5OFF": 0.95, "BA10SAVE": 0.9, "IBERIA15": 0.85, "VOLOTEA5": 0.95, "AIRCORSICA10": 0.9,
-        "KLM25": 0.75, "WIZZ30": 0.7, "TAP20": 0.8, "EUROWINGS15": 0.85, "FRENCHBEE25": 0.75,
-        "GENIUS20": 0.8, "REFER25": 0.9, "SAVE10": 0.9, "TRAVEL20": 0.8, "HOTEL15": 0.85
-    }[code] || (Math.random() * 0.2 + 0.7); // 10-30% par défaut
-    const newPrice = basePrice * discount;
-    const valid = newPrice < basePrice && Math.random() > 0.2; // 80% chance de succès
-    console.log(`[DAN] Test code ${code} : Nouveau prix : ${newPrice.toFixed(2)} €${valid ? " (valide)" : ""}`);
-    return { newPrice, valid, condition: promo ? promo.condition : "Aucune condition" };
+.container {
+    max-width: 100%;
+    margin: auto;
+    text-align: center;
 }
 
-function startSimulation() {
-    const tbody = document.querySelector("#resultsTable tbody");
-    tbody.innerHTML = "";
-    const discounts = [];
-    let index = 0;
-
-    chart = new Chart(document.getElementById("discountChart"), {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Réductions (%)',
-                data: [],
-                borderColor: '#007bff',
-                fill: false
-            }]
-        },
-        options: { scales: { y: { beginAtZero: true, max: 50 } } }
-    });
-
-    Object.entries(PLATFORMS).forEach(([platform, url], idx) => {
-        setTimeout(() => {
-            const basePrice = simulateScrape(url);
-            let bestPrice = basePrice;
-            let bestCode = "Aucun code valide";
-            let bestDiscount = 0;
-            let bestCondition = "Aucune condition";
-
-            PROMO_CODES.forEach(promo => {
-                const { newPrice, valid, condition } = simulateTestCode(basePrice, promo.code);
-                if (valid && newPrice < bestPrice) {
-                    bestPrice = newPrice;
-                    bestCode = promo.code;
-                    bestDiscount = (basePrice - bestPrice) / basePrice * 100;
-                    bestCondition = condition;
-                }
-            });
-
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${platform}</td>
-                <td>${bestPrice.toFixed(2)}</td>
-                <td>${bestCode}</td>
-                <td>${bestDiscount.toFixed(1)}</td>
-                <td>${bestCondition}</td>
-            `;
-            tbody.appendChild(row);
-
-            discounts.push(bestDiscount);
-            chart.data.labels.push(index++);
-            chart.data.datasets[0].data = discounts;
-            chart.update();
-
-            if (idx === Object.keys(PLATFORMS).length - 1) {
-                setTimeout(displayFinalResults, 1000);
-            }
-        }, idx * 1000); // 1s par plateforme pour une simulation rapide
-    });
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
-function displayFinalResults() {
-    const tbody = document.querySelector("#resultsTable tbody");
-    const rows = Array.from(tbody.getElementsByTagName("tr"));
-    rows.sort((a, b) => parseFloat(b.cells[3].textContent) - parseFloat(a.cells[3].textContent));
-    tbody.innerHTML = "";
-    rows.forEach(row => tbody.appendChild(row));
-    console.log("[DAN] Simulation terminée ! Classement final affiché.");
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js');
+button:hover {
+    background-color: #0056b3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #444;
+    padding: 8px;
+    font-size: 14px;
+    text-align: left;
+}
+
+th {
+    background-color: #333;
+}
+
+canvas {
+    margin-top: 20px;
+    width: 100% !important;
+    max-height: 200px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #333;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #444;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 5px;
+}
+
+.close {
+    color: #fff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #007bff;
+}
+
+@media (max-width: 600px) {
+    h1 { font-size: 20px; }
+    button { font-size: 14px; padding: 8px 16px; }
+    th, td { font-size: 12px; padding: 6px; }
+    table { font-size: 12px; }
+    .modal-content { width: 90%; margin: 20% auto; }
 }
